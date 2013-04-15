@@ -16,7 +16,8 @@ module Glimpse::NewRelic
           Glimpse::NewRelic::Providers::Request.new,
           Glimpse::NewRelic::Providers::AgentConfig.new,
           Glimpse::NewRelic::Providers::TransactionTrace.new,
-          Glimpse::NewRelic::Providers::SqlStatements.new
+          Glimpse::NewRelic::Providers::SqlStatements.new,
+          Glimpse::NewRelic::Providers::Metrics.new
         ]
       end
 
