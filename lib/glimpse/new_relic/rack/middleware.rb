@@ -34,7 +34,8 @@ module Glimpse::NewRelic
           original_body = read_response_body(response)
           instrumented_body = inject_javascript(original_body, headers,
                                                 build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js"),
-                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js"))
+                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js"),
+                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/request.js"))
           response = ::Rack::Response.new(instrumented_body, status, headers)
           response.finish
         end
