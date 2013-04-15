@@ -1,4 +1,4 @@
-require "glimpse/newrelic/version"
+require "glimpse/new_relic/version"
 
 module Glimpse
   module NewRelic
