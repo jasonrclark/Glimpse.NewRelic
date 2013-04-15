@@ -10,8 +10,20 @@ module Glimpse::NewRelic
         @log = Logger.new(STDERR)
       end
 
-      # method required by Rack interface
+      GLIMPSE_PATH = /^\/glimpse\/(.*)$/
+
       def call(env)
+        env["PATH_INFO"].match(GLIMPSE_PATH)
+        glimpse_method = $1
+
+        if $1
+          return [200, {}, ["alert('You called #{glimpse_method}');"]]
+        else
+          pass_on_to_app(env)
+        end
+      end
+
+      def pass_on_to_app(env)
         status, headers, response = @app.call(env)
         if should_inject_client?(status, headers)
           original_body = read_response_body(response)
