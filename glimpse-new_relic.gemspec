@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'glimpse/new_relic/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "glimpse-newrelic"
+  spec.name          = "glimpse-new_relic"
   spec.version       = Glimpse::NewRelic::VERSION
   spec.authors       = ["Jason R. Clark", "Ben Weintraub"]
   spec.email         = ["jclark@newrelic.com", "ben@newrelic.com"]
