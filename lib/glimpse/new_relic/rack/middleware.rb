@@ -15,7 +15,7 @@ module Glimpse::NewRelic
         @providers = [
           Glimpse::NewRelic::Providers::AgentConfig.new,
           Glimpse::NewRelic::Providers::Logging.new,
-          Glimpse::NewRelic::Providers::Metrics.new
+          Glimpse::NewRelic::Providers::Metrics.new,
           Glimpse::NewRelic::Providers::Request.new,
           Glimpse::NewRelic::Providers::SqlStatements.new,
           Glimpse::NewRelic::Providers::TransactionTrace.new

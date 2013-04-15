@@ -3,10 +3,10 @@ require "glimpse/new_relic/rack/middleware"
 require "glimpse/new_relic/providers/base"
 require "glimpse/new_relic/providers/agent_config"
 require "glimpse/new_relic/providers/logging"
+require "glimpse/new_relic/providers/metrics"
 require "glimpse/new_relic/providers/request"
 require "glimpse/new_relic/providers/transaction_trace"
 require "glimpse/new_relic/providers/sql_statements"
-require "glimpse/new_relic/providers/metrics"
 
 module Glimpse
   module NewRelic

@@ -54,6 +54,10 @@ module Glimpse
           @capture << ["DEBUG", "#{msgs.join("\n")}"] unless msgs == [""]
           @log.debug(*msgs)
         end
+
+        def method_missing(meth, *args, &block)
+          @log.send(meth, *args, &block)
+        end
       end
     end
   end
