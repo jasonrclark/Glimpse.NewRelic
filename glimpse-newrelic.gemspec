@@ -5,7 +5,7 @@ require 'glimpse/newrelic/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "glimpse-newrelic"
-  spec.version       = Glimpse::Newrelic::VERSION
+  spec.version       = Glimpse::NewRelic::VERSION
   spec.authors       = ["Jason R. Clark", "Ben Weintraub"]
   spec.email         = ["jclark@newrelic.com", "ben@newrelic.com"]
   spec.description   = %q{Glimpse plugin for displaying New Relic information client-side}

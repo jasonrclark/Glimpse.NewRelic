@@ -1,7 +1,7 @@
 require "glimpse/newrelic/version"
 
 module Glimpse
-  module Newrelic
+  module NewRelic
     # Your code goes here...
   end
 end
