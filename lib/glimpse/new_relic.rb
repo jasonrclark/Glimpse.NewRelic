@@ -1,5 +1,6 @@
 require "glimpse/new_relic/version"
 require "glimpse/new_relic/rack/middleware"
+require "glimpse/new_relic/providers/request"
 
 module Glimpse
   module NewRelic

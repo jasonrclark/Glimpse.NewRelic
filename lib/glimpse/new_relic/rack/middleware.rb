@@ -1,4 +1,5 @@
 require 'rack'
+require 'cgi'
 require 'securerandom'
 
 module Glimpse::NewRelic
@@ -11,7 +12,9 @@ module Glimpse::NewRelic
       def initialize(app, options = {})
         @app = app
         @log = Logger.new(STDERR)
-        @requests = {}
+        @providers = [
+          Glimpse::NewRelic::Providers::Request.new
+        ]
       end
 
       def call(env)
@@ -21,17 +24,33 @@ module Glimpse::NewRelic
           env["PATH_INFO"].gsub!(/^\/glimpse\/assets/, '')
           return ::Rack::File.new(ASSETS_PATH).call(env)
         when /^\/glimpse/
-          path_parts = req.path_info.split('/')
-          glimpse_method = path_parts[1..-1].join('/')
-          return [200, {}, ["alert('You called #{glimpse_method}');"]]
+          glimpse_method = req.path_info.gsub(/^\/glimpse\//, '')
+          query_params = CGI::parse(req.query_string)
+          request_uuid = query_params['request_id'].first
+          response_body = self.send(glimpse_method, request_uuid)
+          return [200, { 'Content-Type' => 'application/javascript' }, [response_body]]
         else
           pass_on_to_app(req, env)
         end
       end
 
+      def request_info(request_uuid)
+        request_info = {
+          "clientId" => 'whatevs',
+          'contentType' => 'whatever',
+          'data' => {}
+        }
+        @providers.map do |provider|
+          full_class_name = provider.class.to_s
+          name = "glimpse_#{full_class_name.split('::').last.downcase}"
+          request_info['data'][name] = provider.data_for_request(request_uuid)
+        end
+        request_json = request_info.to_json
+        "glimpse.data.initData(#{request_json});"
+      end
+
       def pass_on_to_app(req, env)
         request_uuid = SecureRandom.uuid
-        @requests[request_uuid] = req
         status, headers, response = @app.call(env)
 
         if should_inject_client?(status, headers)
@@ -39,11 +58,18 @@ module Glimpse::NewRelic
           instrumented_body = inject_javascript(original_body, headers,
                                                 build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js"),
                                                 build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js"),
-                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/request.js?request_id=#{request_uuid}"))
+                                                build_javascript_tag(:src => "/glimpse/request_info?request_id=#{request_uuid}"))
           response = ::Rack::Response.new(instrumented_body, status, headers)
           response.finish
         end
+        notify_providers(env, request_uuid, status, headers, response)
         [status, headers, response]
+      end
+
+      def notify_providers(env, request_uuid, status, headers, response)
+        @providers.each do |provider|
+          provider.notice_request(env, request_uuid, status, headers, response)
+        end
       end
 
       def should_inject_client?(status, headers)
