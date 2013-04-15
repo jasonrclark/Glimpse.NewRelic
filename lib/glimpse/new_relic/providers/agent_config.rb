@@ -9,9 +9,19 @@ module Glimpse
 
         def data_for_request(_)
           {
-            'data' => ::NewRelic::Agent.config.flattened.sort,
+            'data' => [["Key", "Value", "Source"]] + apply_sources(::NewRelic::Agent.config.flattened.sort),
             'name' => 'Agent Config'
           }
+        end
+
+        def apply_sources(config)
+          config.map do |key, value|
+            source = ::NewRelic::Agent.config.source(key).class.name
+            source = source.split('::').last
+            source = source.gsub('Source', '')
+
+            [key, value, source]
+          end
         end
       end
     end
