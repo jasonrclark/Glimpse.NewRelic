@@ -13,11 +13,12 @@ module Glimpse::NewRelic
         @app = app
         @log = Logger.new(STDERR)
         @providers = [
-          Glimpse::NewRelic::Providers::Request.new,
           Glimpse::NewRelic::Providers::AgentConfig.new,
-          Glimpse::NewRelic::Providers::TransactionTrace.new,
-          Glimpse::NewRelic::Providers::SqlStatements.new,
+          Glimpse::NewRelic::Providers::Logging.new,
           Glimpse::NewRelic::Providers::Metrics.new
+          Glimpse::NewRelic::Providers::Request.new,
+          Glimpse::NewRelic::Providers::SqlStatements.new,
+          Glimpse::NewRelic::Providers::TransactionTrace.new
         ]
       end
 
@@ -54,6 +55,8 @@ module Glimpse::NewRelic
       def pass_on_to_app(req, env)
         request_uuid = SecureRandom.uuid
         Thread.current[:new_relic_request_uuid] = request_uuid
+
+        begin_request(env, request_uuid)
         status, headers, response = @app.call(env)
 
         if should_inject_client?(status, headers)
@@ -67,6 +70,12 @@ module Glimpse::NewRelic
         end
         notify_providers(env, request_uuid, status, headers, response)
         [status, headers, response]
+      end
+
+      def begin_request(env, request_uuid)
+        @providers.each do |provider|
+          provider.begin_request(env, request_uuid)
+        end
       end
 
       def notify_providers(env, request_uuid, status, headers, response)

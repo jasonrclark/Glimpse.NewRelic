@@ -9,6 +9,9 @@ module Glimpse
           self.class.name.split("::").last
         end
 
+        def begin_request(env, request_uuid)
+        end
+
         def notice_request(env, request_uuid, status, headers, response)
         end
 
