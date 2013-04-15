@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in glimpse-newrelic.gemspec
+# Specify your gem's dependencies in glimpse-new_relic.gemspec
 gemspec

@@ -13,7 +13,8 @@ module Glimpse::NewRelic
         @app = app
         @log = Logger.new(STDERR)
         @providers = [
-          Glimpse::NewRelic::Providers::Request.new
+          Glimpse::NewRelic::Providers::Request.new,
+          Glimpse::NewRelic::Providers::AgentConfig.new
         ]
       end
 

@@ -1,5 +1,3 @@
-require 'pp'
-
 module Glimpse
   module NewRelic
     module Providers
@@ -22,8 +20,9 @@ module Glimpse
         end
 
         def data_for_request(request_uuid)
+          request = @requests[request_uuid] || {}
           {
-            'data' => filter_request_hash(@requests[request_uuid].dup),
+            'data' => filter_request_hash(request),
             'name' => 'Request'
           }
         end
