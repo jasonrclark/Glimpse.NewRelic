@@ -1,3 +1,5 @@
+require 'pp'
+
 module Glimpse
   module NewRelic
     module Providers
@@ -10,10 +12,18 @@ module Glimpse
           @requests[request_uuid] = env.dup
         end
 
+
+        def filter_request_hash(request)
+          request.delete('rack.logger')
+          request.delete('rack.errors')
+          request.delete('rack.input')
+          request.delete_if { |key, _| key.match(/^action_.*\./) }
+          request
+        end
+
         def data_for_request(request_uuid)
-          request = @requests[request_uuid]
           {
-            'data' => { 'user_agent' => ::Rack::Request.new(request).user_agent },
+            'data' => filter_request_hash(@requests[request_uuid].dup),
             'name' => 'Request'
           }
         end
