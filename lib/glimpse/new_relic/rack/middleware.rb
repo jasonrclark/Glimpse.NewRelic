@@ -1,4 +1,5 @@
 require 'rack'
+require 'securerandom'
 
 module Glimpse::NewRelic
   module Rack
@@ -10,6 +11,7 @@ module Glimpse::NewRelic
       def initialize(app, options = {})
         @app = app
         @log = Logger.new(STDERR)
+        @requests = {}
       end
 
       def call(env)
@@ -23,11 +25,13 @@ module Glimpse::NewRelic
           glimpse_method = path_parts[1..-1].join('/')
           return [200, {}, ["alert('You called #{glimpse_method}');"]]
         else
-          pass_on_to_app(env)
+          pass_on_to_app(req, env)
         end
       end
 
-      def pass_on_to_app(env)
+      def pass_on_to_app(req, env)
+        request_uuid = SecureRandom.uuid
+        @requests[request_uuid] = req
         status, headers, response = @app.call(env)
 
         if should_inject_client?(status, headers)
@@ -35,7 +39,7 @@ module Glimpse::NewRelic
           instrumented_body = inject_javascript(original_body, headers,
                                                 build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js"),
                                                 build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js"),
-                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/request.js"))
+                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/request.js?request_id=#{request_uuid}"))
           response = ::Rack::Response.new(instrumented_body, status, headers)
           response.finish
         end
