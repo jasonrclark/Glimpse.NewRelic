@@ -1,7 +1,7 @@
 module Glimpse
   module NewRelic
     module Providers
-      class Request
+      class Request < Base
         def initialize
           @requests = {}
         end

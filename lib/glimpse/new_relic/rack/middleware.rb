@@ -43,13 +43,7 @@ module Glimpse::NewRelic
           'data' => {}
         }
         @providers.map do |provider|
-          provider_name = if provider.respond_to?(:name)
-            provider.name
-          else
-            full_class_name = provider.class.to_s
-            "glimpse_#{full_class_name.split('::').last.downcase}"
-          end
-          request_info['data'][provider_name] = provider.data_for_request(request_uuid)
+          request_info['data'][provider.name] = provider.data_for_request(request_uuid)
         end
         request_json = request_info.to_json
         "glimpse.data.initData(#{request_json});"

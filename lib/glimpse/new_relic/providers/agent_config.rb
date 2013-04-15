@@ -3,7 +3,7 @@ require 'new_relic/agent'
 module Glimpse
   module NewRelic
     module Providers
-      class AgentConfig
+      class AgentConfig < Base
         def notice_request(*_)
         end
 

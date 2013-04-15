@@ -1,7 +1,7 @@
 module Glimpse
   module NewRelic
     module Providers
-      class TransactionTrace
+      class TransactionTrace < Base
         COLOR_MAP = {
           'ROOT'         => ["#AF78DD", "#823BBE"],
           'ActiveRecord' => ["#F0ED5D", "#DEE81A"],
