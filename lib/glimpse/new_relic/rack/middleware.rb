@@ -3,6 +3,8 @@ require 'rack'
 module Glimpse::NewRelic
   module Rack
     class Middleware
+      ASSETS_PATH = File.expand_path('../../../../../assets', __FILE__)
+
       attr_reader :log
 
       def initialize(app, options = {})
@@ -10,13 +12,15 @@ module Glimpse::NewRelic
         @log = Logger.new(STDERR)
       end
 
-      GLIMPSE_PATH = /^\/glimpse\/(.*)$/
-
       def call(env)
-        env["PATH_INFO"].match(GLIMPSE_PATH)
-        glimpse_method = $1
-
-        if $1
+        req = ::Rack::Request.new(env)
+        case req.path_info
+        when /^\/glimpse\/assets\//
+          env["PATH_INFO"].gsub!(/^\/glimpse\/assets/, '')
+          return ::Rack::File.new(ASSETS_PATH).call(env)
+        when /^\/glimpse/
+          path_parts = req.path_info.split('/')
+          glimpse_method = path_parts[1..-1].join('/')
           return [200, {}, ["alert('You called #{glimpse_method}');"]]
         else
           pass_on_to_app(env)
@@ -25,6 +29,7 @@ module Glimpse::NewRelic
 
       def pass_on_to_app(env)
         status, headers, response = @app.call(env)
+
         if should_inject_client?(status, headers)
           original_body = read_response_body(response)
           instrumented_body = inject_javascript_tag(original_body, headers, :src => "glimpse/client")
