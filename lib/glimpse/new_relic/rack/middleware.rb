@@ -32,7 +32,9 @@ module Glimpse::NewRelic
 
         if should_inject_client?(status, headers)
           original_body = read_response_body(response)
-          instrumented_body = inject_javascript_tag(original_body, headers, :src => "/glimpse/assets/javascripts/client.js")
+          instrumented_body = inject_javascript(original_body, headers,
+                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js"),
+                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js"))
           response = ::Rack::Response.new(instrumented_body, status, headers)
           response.finish
         end
@@ -51,11 +53,9 @@ module Glimpse::NewRelic
         body
       end
 
-      def inject_javascript_tag(rsp, headers, attrs)
+      def inject_javascript(rsp, headers, *tags)
         if rsp.index("<body") && (body_close = rsp.rindex("</body>"))
-          tag = build_javascript_tag(attrs)
-          log.debug("Injecting tag '#{tag}' into body @ #{body_close}")
-          rsp = rsp[0..(body_close-1)] << tag << rsp[body_close..-1]
+          rsp = rsp[0..(body_close-1)] << tags.join("\n") << rsp[body_close..-1]
           headers['Content-Length'] = rsp.length.to_s if headers['Content-Length']
         else
           log.warn("Did not find body tags to inject into")
