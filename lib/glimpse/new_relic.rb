@@ -4,6 +4,7 @@ require "glimpse/new_relic/providers/base"
 require "glimpse/new_relic/providers/request"
 require "glimpse/new_relic/providers/agent_config"
 require "glimpse/new_relic/providers/transaction_trace"
+require "glimpse/new_relic/providers/sql_statements"
 
 module Glimpse
   module NewRelic

@@ -15,7 +15,8 @@ module Glimpse::NewRelic
         @providers = [
           Glimpse::NewRelic::Providers::Request.new,
           Glimpse::NewRelic::Providers::AgentConfig.new,
-          Glimpse::NewRelic::Providers::TransactionTrace.new
+          Glimpse::NewRelic::Providers::TransactionTrace.new,
+          Glimpse::NewRelic::Providers::SqlStatements.new
         ]
       end
 
@@ -51,6 +52,7 @@ module Glimpse::NewRelic
 
       def pass_on_to_app(req, env)
         request_uuid = SecureRandom.uuid
+        Thread.current[:new_relic_request_uuid] = request_uuid
         status, headers, response = @app.call(env)
 
         if should_inject_client?(status, headers)
