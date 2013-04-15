@@ -32,7 +32,7 @@ module Glimpse::NewRelic
 
         if should_inject_client?(status, headers)
           original_body = read_response_body(response)
-          instrumented_body = inject_javascript_tag(original_body, headers, :src => "glimpse/client")
+          instrumented_body = inject_javascript_tag(original_body, headers, :src => "/glimpse/assets/javascripts/client.js")
           response = ::Rack::Response.new(instrumented_body, status, headers)
           response.finish
         end
