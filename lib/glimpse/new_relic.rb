@@ -2,6 +2,7 @@ require "glimpse/new_relic/version"
 require "glimpse/new_relic/rack/middleware"
 require "glimpse/new_relic/providers/request"
 require "glimpse/new_relic/providers/agent_config"
+require "glimpse/new_relic/providers/transaction_trace"
 
 module Glimpse
   module NewRelic

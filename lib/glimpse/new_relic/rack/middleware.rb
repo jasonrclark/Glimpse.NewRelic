@@ -14,7 +14,8 @@ module Glimpse::NewRelic
         @log = Logger.new(STDERR)
         @providers = [
           Glimpse::NewRelic::Providers::Request.new,
-          Glimpse::NewRelic::Providers::AgentConfig.new
+          Glimpse::NewRelic::Providers::AgentConfig.new,
+          Glimpse::NewRelic::Providers::TransactionTrace.new
         ]
       end
 
@@ -42,9 +43,13 @@ module Glimpse::NewRelic
           'data' => {}
         }
         @providers.map do |provider|
-          full_class_name = provider.class.to_s
-          name = "glimpse_#{full_class_name.split('::').last.downcase}"
-          request_info['data'][name] = provider.data_for_request(request_uuid)
+          provider_name = if provider.respond_to?(:name)
+            provider.name
+          else
+            full_class_name = provider.class.to_s
+            "glimpse_#{full_class_name.split('::').last.downcase}"
+          end
+          request_info['data'][provider_name] = provider.data_for_request(request_uuid)
         end
         request_json = request_info.to_json
         "glimpse.data.initData(#{request_json});"
