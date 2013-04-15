@@ -9,7 +9,7 @@ module Glimpse
 
         def data_for_request(_)
           {
-            'data' => ::NewRelic::Agent.config.flattened,
+            'data' => ::NewRelic::Agent.config.flattened.sort,
             'name' => 'Agent Config'
           }
         end
