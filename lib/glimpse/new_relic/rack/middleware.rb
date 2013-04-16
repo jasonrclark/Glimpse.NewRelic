@@ -32,8 +32,8 @@ module Glimpse::NewRelic
           glimpse_method = req.path_info.gsub(/^\/glimpse\//, '')
           query_params = CGI::parse(req.query_string)
           request_uuid = query_params['request_id'].first
-          response_body = self.send(glimpse_method, request_uuid)
-          return [200, { 'Content-Type' => 'application/javascript' }, [response_body]]
+          response_body, contentType = self.send(glimpse_method, request_uuid, env)
+          return [200, { 'Content-Type' => contentType }, [response_body]]
         else
           pass_on_to_app(req, env)
         end
@@ -58,10 +58,12 @@ module Glimpse::NewRelic
         end
       end
 
-      def request_info(request_uuid)
+      def request_info(request_uuid, env)
         request_info = {
           "clientId" => 'whatevs',
           'contentType' => 'whatever',
+          'requestId' => request_uuid,
+          'uri' => env["REQUEST_URI"],
           'data' => {}
         }
         @providers.map do |provider|
@@ -69,7 +71,22 @@ module Glimpse::NewRelic
         end
         round_numbers(request_info['data'])
         request_json = request_info.to_json
-        "glimpse.data.initData(#{request_json});"
+        ["glimpse.data.initData(#{request_json});", "application/javascript"]
+      end
+
+      def popup(request_uuid, _)
+        html = <<EOH
+  <html>
+  <head><title>Glimpse Popup</title></head>
+  <body class="glimpse-popup">
+    #{build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js")}
+    #{build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js")}
+    #{build_javascript_tag(:src => "/glimpse/request_info?request_id=#{request_uuid}")}
+  </body>
+  </html>
+EOH
+
+        [html, "text/html"]
       end
 
       def pass_on_to_app(req, env)
