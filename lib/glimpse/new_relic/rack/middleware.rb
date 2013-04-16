@@ -12,7 +12,9 @@ module Glimpse::NewRelic
       def initialize(app, options = {})
         @app = app
         @log = Logger.new(STDERR)
+        @history = Glimpse::NewRelic::Providers::History.new
         @providers = [
+          @history,
           Glimpse::NewRelic::Providers::AgentConfig.new,
           Glimpse::NewRelic::Providers::Logging.new,
           Glimpse::NewRelic::Providers::Metrics.new,
@@ -43,7 +45,7 @@ module Glimpse::NewRelic
           'requestId' => request_uuid,
           'data' => {}
         }
-        @providers.map do |provider|
+        @providers.each do |provider|
           provider.data_for_request(request_uuid, request_info)
         end
         round_numbers(request_info['data'])
@@ -53,7 +55,7 @@ module Glimpse::NewRelic
         if (callback)
           ["#{callback}(#{request_json});", "application/javascript"]
         else
-          [request_json, "application/javascript"]
+          [request_json, "application/json"]
         end
       end
 
@@ -70,6 +72,10 @@ module Glimpse::NewRelic
 EOH
 
         [html, "text/html"]
+      end
+
+      def history(*args)
+        [@history.requests.to_json, "application/json"]
       end
 
       def pass_on_to_app(req, env)

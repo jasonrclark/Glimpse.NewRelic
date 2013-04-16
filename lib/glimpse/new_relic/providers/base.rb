@@ -15,8 +15,7 @@ module Glimpse
         def notice_request(env, request_uuid, status, headers, response)
         end
 
-        def data_for_request
-          {}
+        def data_for_request(*args)
         end
       end
     end
