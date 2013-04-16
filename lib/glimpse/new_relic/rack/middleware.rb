@@ -31,35 +31,14 @@ module Glimpse::NewRelic
           return ::Rack::File.new(ASSETS_PATH).call(env)
         when /^\/glimpse/
           glimpse_method = req.path_info.gsub(/^\/glimpse\//, '')
-          query_params = CGI::parse(req.query_string)
-          request_uuid = query_params['request_id'].first
-          response_body, contentType = self.send(glimpse_method, request_uuid, env)
+          response_body, contentType = self.send(glimpse_method, req.params["request_id"], req)
           return [200, { 'Content-Type' => contentType }, [response_body]]
         else
           pass_on_to_app(req, env)
         end
       end
 
-      # yuck
-      def round_numbers(root)
-        indicies = case root
-        when Array then (0...root.size).to_a
-        when Hash  then root.keys
-        end
-        if indicies
-          indicies.each do |i|
-            o = root[i]
-            case o
-            when Float
-              root[i] = o.round(3)
-            when Hash, Array
-              round_numbers(o)
-            end
-          end
-        end
-      end
-
-      def request_info(request_uuid, env)
+      def request_info(request_uuid, req)
         request_info = {
           'requestId' => request_uuid,
           'data' => {}
@@ -69,7 +48,13 @@ module Glimpse::NewRelic
         end
         round_numbers(request_info['data'])
         request_json = request_info.to_json
-        ["glimpse.data.initData(#{request_json});", "application/javascript"]
+
+        callback = req.params["callback"]
+        if (callback)
+          ["#{callback}(#{request_json});", "application/javascript"]
+        else
+          [request_json, "application/javascript"]
+        end
       end
 
       def popup(request_uuid, _)
@@ -79,7 +64,7 @@ module Glimpse::NewRelic
   <body class="glimpse-popup">
     #{build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js")}
     #{build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js")}
-    #{build_javascript_tag(:src => "/glimpse/request_info?request_id=#{request_uuid}")}
+    #{build_javascript_tag(:src => "/glimpse/request_info?request_id=#{request_uuid}&callback=glimpse.data.initData")}
   </body>
   </html>
 EOH
@@ -99,7 +84,7 @@ EOH
           instrumented_body = inject_javascript(original_body, headers,
                                                 build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js"),
                                                 build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js"),
-                                                build_javascript_tag(:src => "/glimpse/request_info?request_id=#{request_uuid}"))
+                                                build_javascript_tag(:src => "/glimpse/request_info?request_id=#{request_uuid}&callback=glimpse.data.initData"))
           response = ::Rack::Response.new(instrumented_body, status, headers)
           response.finish
         end
@@ -150,6 +135,25 @@ EOH
         tag << attr_strings.join(" ")
         tag << "></script>"
         tag
+      end
+
+      # yuck
+      def round_numbers(root)
+        indicies = case root
+        when Array then (0...root.size).to_a
+        when Hash  then root.keys
+        end
+        if indicies
+          indicies.each do |i|
+            o = root[i]
+            case o
+            when Float
+              root[i] = o.round(3)
+            when Hash, Array
+              round_numbers(o)
+            end
+          end
+        end
       end
     end
   end
