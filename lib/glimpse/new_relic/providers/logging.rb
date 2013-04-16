@@ -28,7 +28,7 @@ module Glimpse
         end
 
         def latest_data
-          @capture.last(40)
+          @capture.last(40).map { |(level, msg)| [level, msg.strip] }
         end
 
         def fatal(*msgs)
