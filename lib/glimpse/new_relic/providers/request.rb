@@ -10,7 +10,6 @@ module Glimpse
           @requests[request_uuid] = [env.dup, headers.dup]
         end
 
-
         def filter_request_hash(request)
           request.delete('rack.logger')
           request.delete('rack.errors')
