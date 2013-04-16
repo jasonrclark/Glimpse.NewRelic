@@ -18,6 +18,10 @@ module Glimpse
           ['#008FFF', '#008FFF']
         ]
 
+        def self.valid?
+          has_newrelic?
+        end
+
         def initialize
           @traces = {}
         end

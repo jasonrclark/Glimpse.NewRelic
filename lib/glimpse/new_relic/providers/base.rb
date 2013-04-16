@@ -28,6 +28,12 @@ module Glimpse
           defined?(::Rails)
         end
 
+        def self.has_newrelic?
+          defined?(::NewRelic) && ::NewRelic::Agent.agent.started?
+        rescue RuntimeError => ex
+          false
+        end
+
         def initialize
         end
 

@@ -5,6 +5,10 @@ module Glimpse
     module Providers
       class AgentConfig < Base
 
+        def self.valid?
+          has_newrelic?
+        end
+
         def data_for_request(_, request_info)
           request_info['data'][self.name] =
           {

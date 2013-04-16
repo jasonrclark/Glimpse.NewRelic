@@ -2,6 +2,10 @@ module Glimpse
   module NewRelic
     module Providers
       class SqlStatements < Base
+        def self.valid?
+          has_newrelic?
+        end
+
         def initialize
           @statements = {}
           ::NewRelic::Agent.instance.events.subscribe('sql') do |sql, config, duration|

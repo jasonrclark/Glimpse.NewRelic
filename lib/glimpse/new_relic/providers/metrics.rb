@@ -2,6 +2,11 @@ module Glimpse
   module NewRelic
     module Providers
       class Metrics < Base
+
+        def self.valid?
+          has_newrelic?
+        end
+
         def initialize
           @metrics = {}
           ::NewRelic::Agent.instance.events.subscribe('transaction_metrics') do |stats|
