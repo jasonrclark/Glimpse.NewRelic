@@ -12,9 +12,11 @@ module Glimpse::NewRelic
       def initialize(app, options = {})
         @app = app
         @log = Logger.new(STDERR)
+
         @providers = Glimpse::NewRelic::Providers::Base.subclasses.map do |cls|
-          cls.new
-        end
+          cls.new if cls.valid?
+        end.compact
+
         @history = @providers.detect do |p|
           p.class == Glimpse::NewRelic::Providers::History
         end

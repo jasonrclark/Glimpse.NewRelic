@@ -5,6 +5,10 @@ module Glimpse
     module Providers
       class RailsConfig < Base
 
+        def self.valid?
+          has_rails?
+        end
+
         def data_for_request(_, request_info)
           request_info['data'][self.name] =
             {

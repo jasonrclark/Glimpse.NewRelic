@@ -20,6 +20,14 @@ module Glimpse
           end
         end
 
+        def self.valid?
+          true
+        end
+
+        def self.has_rails?
+          defined?(::Rails)
+        end
+
         def initialize
         end
 

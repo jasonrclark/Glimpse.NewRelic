@@ -4,6 +4,11 @@ module Glimpse
   module NewRelic
     module Providers
       class Middlewares < Base
+
+        def self.valid?
+          has_rails?
+        end
+
         def data_for_request(_, request_info)
           stack = Rails.configuration.middleware
           rows = stack.map do |middleware|

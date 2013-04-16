@@ -5,6 +5,10 @@ module Glimpse
     module Providers
       class Logging < Base
 
+        def self.valid?
+          has_rails?
+        end
+
         def begin_request(*_)
           if (::Rails.logger.class != CapturingLogger)
             @logger = CapturingLogger.new
