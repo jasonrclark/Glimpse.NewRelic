@@ -17,6 +17,7 @@ module Glimpse::NewRelic
           Glimpse::NewRelic::Providers::Logging.new,
           Glimpse::NewRelic::Providers::Metrics.new,
           Glimpse::NewRelic::Providers::Request.new,
+          Glimpse::NewRelic::Providers::RailsConfig.new,
           Glimpse::NewRelic::Providers::SqlStatements.new,
           Glimpse::NewRelic::Providers::TransactionTrace.new
         ]

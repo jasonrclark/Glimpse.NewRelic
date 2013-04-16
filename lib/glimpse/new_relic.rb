@@ -5,6 +5,7 @@ require "glimpse/new_relic/providers/agent_config"
 require "glimpse/new_relic/providers/logging"
 require "glimpse/new_relic/providers/metrics"
 require "glimpse/new_relic/providers/request"
+require "glimpse/new_relic/providers/rails_config"
 require "glimpse/new_relic/providers/transaction_trace"
 require "glimpse/new_relic/providers/sql_statements"
 
