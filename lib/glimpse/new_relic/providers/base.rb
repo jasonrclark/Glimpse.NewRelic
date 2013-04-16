@@ -12,7 +12,7 @@ module Glimpse
         def begin_request(env, request_uuid)
         end
 
-        def notice_request(env, request_uuid, status, headers, response)
+        def end_request(env, request_uuid, status, headers, response)
         end
 
         def data_for_request(*args)

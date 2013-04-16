@@ -22,7 +22,7 @@ module Glimpse
           "glimpse_timeline"
         end
 
-        def notice_request(env, request_uuid, status, headers, response)
+        def end_request(env, request_uuid, status, headers, response)
           @traces[request_uuid] = ::NewRelic::Agent::TransactionInfo.get.transaction.transaction_trace
         end
 

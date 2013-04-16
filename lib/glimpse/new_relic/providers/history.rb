@@ -8,7 +8,7 @@ module Glimpse
           @requests = []
         end
 
-        def notice_request(env, request_uuid, status, headers, response)
+        def end_request(env, request_uuid, status, headers, response)
           parent_request_id = env["HTTP_GLIMPSE_PARENT_REQUESTID"]
           @requests << {
             "clientId" => "Chrome 21",

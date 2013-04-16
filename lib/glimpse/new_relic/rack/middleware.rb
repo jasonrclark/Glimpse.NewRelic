@@ -88,17 +88,9 @@ EOH
 
         begin_request(env, request_uuid)
         status, headers, response = @app.call(env)
+        response = inject_client_if_necessary(request_uuid, status, headers, response)
+        end_request(env, request_uuid, status, headers, response)
 
-        if should_inject_client?(status, headers)
-          original_body = read_response_body(response)
-          instrumented_body = inject_javascript(original_body, headers,
-                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js"),
-                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js"),
-                                                build_javascript_tag(:src => "/glimpse/request_info?request_id=#{request_uuid}&callback=glimpse.data.initData"))
-          response = ::Rack::Response.new(instrumented_body, status, headers)
-          response.finish
-        end
-        notify_providers(env, request_uuid, status, headers, response)
         [status, headers, response]
       end
 
@@ -108,10 +100,23 @@ EOH
         end
       end
 
-      def notify_providers(env, request_uuid, status, headers, response)
+      def end_request(env, request_uuid, status, headers, response)
         @providers.each do |provider|
-          provider.notice_request(env, request_uuid, status, headers, response)
+          provider.end_request(env, request_uuid, status, headers, response)
         end
+      end
+
+      def inject_client_if_necessary(request_uuid, status, headers, response)
+        if should_inject_client?(status, headers)
+          original_body = read_response_body(response)
+          instrumented_body = inject_javascript(original_body, headers,
+                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/client.js"),
+                                                build_javascript_tag(:src => "/glimpse/assets/javascripts/metadata.js"),
+                                                build_javascript_tag(:src => "/glimpse/request_info?request_id=#{request_uuid}&callback=glimpse.data.initData"))
+          response = ::Rack::Response.new(instrumented_body, status, headers)
+          response.finish
+        end
+        response
       end
 
       def should_inject_client?(status, headers)
