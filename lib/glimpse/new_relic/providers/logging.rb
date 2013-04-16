@@ -20,7 +20,7 @@ module Glimpse
           request_info['data'][self.name] =
           {
             'data' => [["Level", "Message"]] + @logger.latest_data.reverse,
-            'name' => 'Latest Logs'
+            'name' => 'Rails Log'
           }
         end
       end
