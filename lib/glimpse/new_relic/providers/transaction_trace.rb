@@ -6,12 +6,16 @@ module Glimpse
           'ROOT'         => ["#AF78DD", "#823BBE"],
           'ActiveRecord' => ["#F0ED5D", "#DEE81A"],
           'Controller'   => ["#FDBF45", "#DDA431"],
-          'View'         => ["#10E309", "#0EC41D"]
+          'View'         => ["#07C500", "#07C500"]
         }
 
+        DEFAULT_COLOR = ['#ECECEC', '#ECECEC']
+
         OTHER_COLORS = [
-          ["#EEEEEE", "#CCCCCC"], # other
-          ["#72A3E4", "#5087CF"]  # filter
+          ["#FF25F8", "#FF25F8"],
+          ["#25EEFF", "#25EEFF"],
+          ['#B8FF00', '#B8FF00'],
+          ['#008FFF', '#008FFF']
         ]
 
         def initialize
@@ -64,10 +68,12 @@ module Glimpse
 
           category_names = events.map { |e| e['category'] }.uniq
 
+          other_colors = OTHER_COLORS.dup
+
           categories = {}
           category_names.map do |name|
             categories[name] = {}
-            colors = COLOR_MAP[name] || OTHER_COLORS.sample
+            colors = COLOR_MAP[name] || other_colors.shift || DEFAULT_COLOR
             categories[name]['eventColor'] = colors[0]
             categories[name]['eventColorHighlight'] = colors[1]
           end
