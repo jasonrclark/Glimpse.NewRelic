@@ -8,12 +8,12 @@ module Glimpse
           @requests = []
         end
 
-        def end_request(env, request_uuid, status, headers, response)
+        def end_request(env, request_uuid, status, headers, response, duration)
           parent_request_id = env["HTTP_GLIMPSE_PARENT_REQUESTID"]
           @requests << {
             "clientId" => "Chrome 21",
             "dateTime" => Time.now.to_s,
-            "duration" => 0.0,
+            "duration" => duration,
             "parentRequestId" => parent_request_id,
             "requestId" => request_uuid,
             "isAjax" => !parent_request_id.nil?,

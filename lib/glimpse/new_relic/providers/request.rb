@@ -6,7 +6,7 @@ module Glimpse
           @requests = {}
         end
 
-        def end_request(env, request_uuid, status, headers, response)
+        def end_request(env, request_uuid, status, headers, response, duration)
           @requests[request_uuid] = [env.dup, headers.dup]
         end
 

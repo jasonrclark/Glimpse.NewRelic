@@ -87,9 +87,11 @@ EOH
         Thread.current[:new_relic_request_uuid] = request_uuid
 
         begin_request(env, request_uuid)
+        start = Time.now
         status, headers, response = @app.call(env)
         response = inject_client_if_necessary(request_uuid, status, headers, response)
-        end_request(env, request_uuid, status, headers, response)
+        duration = ((Time.now - start) * 1000).round(3)
+        end_request(env, request_uuid, status, headers, response, duration)
 
         [status, headers, response]
       end
@@ -100,9 +102,9 @@ EOH
         end
       end
 
-      def end_request(env, request_uuid, status, headers, response)
+      def end_request(env, request_uuid, status, headers, response, duration)
         @providers.each do |provider|
-          provider.end_request(env, request_uuid, status, headers, response)
+          provider.end_request(env, request_uuid, status, headers, response, duration)
         end
       end
 
