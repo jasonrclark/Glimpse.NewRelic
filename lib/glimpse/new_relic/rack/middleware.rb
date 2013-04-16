@@ -12,17 +12,12 @@ module Glimpse::NewRelic
       def initialize(app, options = {})
         @app = app
         @log = Logger.new(STDERR)
-        @history = Glimpse::NewRelic::Providers::History.new
-        @providers = [
-          @history,
-          Glimpse::NewRelic::Providers::AgentConfig.new,
-          Glimpse::NewRelic::Providers::Logging.new,
-          Glimpse::NewRelic::Providers::Metrics.new,
-          Glimpse::NewRelic::Providers::Request.new,
-          Glimpse::NewRelic::Providers::RailsConfig.new,
-          Glimpse::NewRelic::Providers::SqlStatements.new,
-          Glimpse::NewRelic::Providers::TransactionTrace.new
-        ]
+        @providers = Glimpse::NewRelic::Providers::Base.subclasses.map do |cls|
+          cls.new
+        end
+        @history = @providers.detect do |p|
+          p.class == Glimpse::NewRelic::Providers::History
+        end
       end
 
       def call(env)

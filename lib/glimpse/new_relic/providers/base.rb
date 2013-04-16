@@ -2,6 +2,24 @@ module Glimpse
   module NewRelic
     module Providers
       class Base
+        def self.inherited(subclass)
+          @subclasses ||= []
+          @subclasses << (subclass)
+        end
+
+        def self.subclasses
+          @subclasses
+        end
+
+        def self.autoload_providers
+          self_path = File.expand_path(__FILE__)
+          providers_path = File.dirname(self_path)
+          providers = Dir[File.join(providers_path, '*.rb')]
+          (providers - [self_path]).each do |provider_path|
+            require provider_path
+          end
+        end
+
         def initialize
         end
 

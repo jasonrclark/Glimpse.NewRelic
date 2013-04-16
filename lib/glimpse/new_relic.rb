@@ -1,19 +1,12 @@
 require "glimpse/new_relic/version"
 require "glimpse/new_relic/rack/middleware"
 require "glimpse/new_relic/providers/base"
-require "glimpse/new_relic/providers/agent_config"
-require "glimpse/new_relic/providers/history"
-require "glimpse/new_relic/providers/logging"
-require "glimpse/new_relic/providers/metrics"
-require "glimpse/new_relic/providers/request"
-require "glimpse/new_relic/providers/rails_config"
-require "glimpse/new_relic/providers/transaction_trace"
-require "glimpse/new_relic/providers/sql_statements"
 
 module Glimpse
   module NewRelic
     def self.startup
       rails_config.middleware.use Glimpse::NewRelic::Rack::Middleware unless rails_config.nil?
+      Providers::Base.autoload_providers
     end
 
     def self.rails_config
