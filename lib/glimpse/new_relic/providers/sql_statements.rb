@@ -21,7 +21,8 @@ module Glimpse
           rows
         end
 
-        def data_for_request(request_uuid)
+        def data_for_request(request_uuid, request_info)
+          request_info['data'][self.name] =
           {
             'data' => sql_trace_table(request_uuid),
             'name' => "SQL Statements"

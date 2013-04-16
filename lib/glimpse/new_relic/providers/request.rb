@@ -19,8 +19,12 @@ module Glimpse
           request
         end
 
-        def data_for_request(request_uuid)
+        def data_for_request(request_uuid, request_info)
           request = @requests[request_uuid] || {}
+          request_info['clientId'] = "Chrome 26"    # Where's this actually come from?
+          request_info['contentType'] = "text/html" # TODO: Need to hold onto the response headers too
+          request_info['uri'] = request["REQUEST_URI"]
+          request_info['data'][self.name] =
           {
             'data' => filter_request_hash(request),
             'name' => 'Request'

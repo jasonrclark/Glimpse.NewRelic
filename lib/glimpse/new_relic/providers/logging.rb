@@ -12,7 +12,8 @@ module Glimpse
           end
         end
 
-        def data_for_request(request_uuid)
+        def data_for_request(request_uuid, request_info)
+          request_info['data'][self.name] =
           {
             'data' => [["Level", "Message"]] + @logger.latest_data.reverse,
             'name' => 'Latest Logs'

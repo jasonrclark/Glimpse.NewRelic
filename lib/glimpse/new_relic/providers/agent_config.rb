@@ -7,7 +7,8 @@ module Glimpse
         def notice_request(*_)
         end
 
-        def data_for_request(_)
+        def data_for_request(_, request_info)
+          request_info['data'][self.name] =
           {
             'data' => [["Key", "Value", "Source"]] + apply_sources(::NewRelic::Agent.config.flattened.sort),
             'name' => 'Agent Config'

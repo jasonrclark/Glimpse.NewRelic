@@ -65,8 +65,9 @@ module Glimpse
           }
         end
 
-        def data_for_request(request_uuid)
+        def data_for_request(request_uuid, request_info)
           trace = @traces[request_uuid]
+          request_info['data'][self.name] =
           {
             'data' => transaction_trace_to_timeline(trace),
             'name' => 'Transaction Trace'

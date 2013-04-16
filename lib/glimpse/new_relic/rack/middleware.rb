@@ -60,14 +60,11 @@ module Glimpse::NewRelic
 
       def request_info(request_uuid, env)
         request_info = {
-          "clientId" => 'whatevs',
-          'contentType' => 'whatever',
           'requestId' => request_uuid,
-          'uri' => env["REQUEST_URI"],
           'data' => {}
         }
         @providers.map do |provider|
-          request_info['data'][provider.name] = provider.data_for_request(request_uuid)
+          provider.data_for_request(request_uuid, request_info)
         end
         round_numbers(request_info['data'])
         request_json = request_info.to_json
