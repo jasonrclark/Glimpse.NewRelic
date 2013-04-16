@@ -7,7 +7,7 @@ module Glimpse
         end
 
         def notice_request(env, request_uuid, status, headers, response)
-          @requests[request_uuid] = env.dup
+          @requests[request_uuid] = [env.dup, headers.dup]
         end
 
 
@@ -20,9 +20,9 @@ module Glimpse
         end
 
         def data_for_request(request_uuid, request_info)
-          request = @requests[request_uuid] || {}
+          request, response = (@requests[request_uuid] || [{}, {}])
           request_info['clientId'] = "Chrome 26"    # Where's this actually come from?
-          request_info['contentType'] = "text/html" # TODO: Need to hold onto the response headers too
+          request_info['contentType'] = response["Content-Type"]
           request_info['uri'] = request["REQUEST_URI"]
           request_info['data'][self.name] =
           {
