@@ -30,8 +30,22 @@ module Glimpse
           t * 1000
         end
 
+        def format_start_time(timestamp_seconds)
+          Time.at(timestamp_seconds).strftime("%m/%d/%Y %H:%M:%S")
+        end
+
         def category_for_segment(segment)
           segment.metric_name.split('/').first
+        end
+
+        def details_for_segment(segment)
+          details = {}
+          ignored_keys = [:backtrace, :connection_config]
+          keys = segment.params.keys - ignored_keys
+          keys.each do |key|
+            details[key] = segment.params[key]
+          end
+          details
         end
 
         def transaction_trace_to_timeline(trace)
@@ -41,8 +55,8 @@ module Glimpse
             events << {
               'title' => segment.metric_name,
               'category' => category_for_segment(segment),
-              'startTime' => Time.at(segment.entry_timestamp).strftime("%m/%d/%Y %H:%M:%S"),
-              'details' => {},
+              'startTime' => format_start_time(segment.entry_timestamp),
+              'details' => details_for_segment(segment),
               'duration' => seconds_to_milliseconds(segment.exit_timestamp - segment.entry_timestamp),
               'startPoint' => seconds_to_milliseconds(segment.entry_timestamp)
             }
