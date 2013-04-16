@@ -3,8 +3,10 @@ glimpse.data.initMetadata({
         "glimpse_client": "/glimpse/assets/javascripts/client.js",
         "glimpse_logo": "/glimpse/assets/images/logo.png",
         "glimpse_metadata": "/glimpse/assets/javascripts/metadata.js",
-        "glimpse_popup": "/glimpse/popup?n=glimpse_popup&request_id={requestId}",
         "glimpse_sprite": "/glimpse/assets/images/sprite.png",
+
+        // n=glimpse_popup require to convince glimpse client that we're a popup window!
+        "glimpse_popup": "/glimpse/popup?n=glimpse_popup&request_id={requestId}",
 
         "glimpse_ajax": "/glimpse/ajax/NotImplemented",
         "glimpse_config": "/glimpse/config/NotImplemented",
