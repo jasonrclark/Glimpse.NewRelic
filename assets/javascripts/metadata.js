@@ -1,5 +1,6 @@
 glimpse.data.initMetadata({
     "resources": {
+        "glimpse_ajax": "/glimpse/ajax?parentRequestId={parentRequestId}{&callback}",
         "glimpse_client": "/glimpse/assets/javascripts/client.js",
         "glimpse_history": "/glimpse/history{&top}",
         "glimpse_logo": "/glimpse/assets/images/logo.png",
@@ -10,7 +11,6 @@ glimpse.data.initMetadata({
         // n=glimpse_popup require to convince glimpse client that we're a popup window!
         "glimpse_popup": "/glimpse/popup?n=glimpse_popup&request_id={requestId}",
 
-        "glimpse_ajax": "/glimpse/ajax/NotImplemented",
         "glimpse_config": "/glimpse/config/NotImplemented",
         "glimpse_version_check": "/glimpse/version_check/NotImplemented"
     },

@@ -78,6 +78,10 @@ EOH
         [@history.requests.to_json, "application/json"]
       end
 
+      def ajax(_, req)
+        [@history.requests_for_parent(req.params["parentRequestId"]).to_json, "application/json"]
+      end
+
       def pass_on_to_app(req, env)
         request_uuid = SecureRandom.uuid
         Thread.current[:new_relic_request_uuid] = request_uuid

@@ -9,13 +9,14 @@ module Glimpse
         end
 
         def notice_request(env, request_uuid, status, headers, response)
+          parent_request_id = env["HTTP_GLIMPSE_PARENT_REQUESTID"]
           @requests << {
             "clientId" => "Chrome 21",
             "dateTime" => Time.now.to_s,
             "duration" => 0.0,
-            "parentRequestId" => nil,
+            "parentRequestId" => parent_request_id,
             "requestId" => request_uuid,
-            "isAjax" => false,
+            "isAjax" => !parent_request_id.nil?,
             "method" => env["REQUEST_METHOD"],
             "uri" => env["REQUEST_URI"],
             "contentType" => headers["Content-Type"],
@@ -29,6 +30,10 @@ module Glimpse
           {
             "Chrome 21" => @requests.dup
           }
+        end
+
+        def requests_for_parent(parent_request_id)
+          @requests.select {|r| r["parentRequestId"] == parent_request_id && r["isAjax"]}
         end
 
       end
