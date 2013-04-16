@@ -39,6 +39,25 @@ module Glimpse::NewRelic
         end
       end
 
+      # yuck
+      def round_numbers(root)
+        indicies = case root
+        when Array then (0...root.size).to_a
+        when Hash  then root.keys
+        end
+        if indicies
+          indicies.each do |i|
+            o = root[i]
+            case o
+            when Float
+              root[i] = o.round(3)
+            when Hash, Array
+              round_numbers(o)
+            end
+          end
+        end
+      end
+
       def request_info(request_uuid)
         request_info = {
           "clientId" => 'whatevs',
@@ -48,6 +67,7 @@ module Glimpse::NewRelic
         @providers.map do |provider|
           request_info['data'][provider.name] = provider.data_for_request(request_uuid)
         end
+        round_numbers(request_info['data'])
         request_json = request_info.to_json
         "glimpse.data.initData(#{request_json});"
       end
