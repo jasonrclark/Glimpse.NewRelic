@@ -32,21 +32,21 @@ module Glimpse
         end
 
         def latest_data
-          @capture.last(40).map { |(level, msg)| [level, msg.strip] }
+          @capture.last(40).map { |(level, msg, option)| [level, msg.strip, option] }
         end
 
         def fatal(*msgs)
-          @capture << ["FATAL", "#{msgs.join("\n")}"] unless msgs == [""]
+          @capture << ["FATAL", "#{msgs.join("\n")}", "error"] unless msgs == [""]
           @log.fatal(*msgs)
         end
 
         def error(*msgs)
-          @capture << ["ERROR", "#{msgs.join("\n")}"] unless msgs == [""]
+          @capture << ["ERROR", "#{msgs.join("\n")}", "error"] unless msgs == [""]
           @log.error(*msgs)
         end
 
         def warn(*msgs)
-          @capture << ["WARN", "#{msgs.join("\n")}"] unless msgs == [""]
+          @capture << ["WARN", "#{msgs.join("\n")}", "warn"] unless msgs == [""]
           @log.warn(*msgs)
         end
 
