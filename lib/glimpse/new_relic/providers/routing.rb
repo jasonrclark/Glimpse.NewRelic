@@ -21,7 +21,7 @@ module Glimpse
             'data' => data,
             'name' => 'Rails Routes'
           }
-        rescue
+        rescue Exception => ex
           nil
         end
       end

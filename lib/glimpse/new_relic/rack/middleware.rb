@@ -29,9 +29,14 @@ module Glimpse::NewRelic
           env["PATH_INFO"].gsub!(/^\/glimpse\/assets/, '')
           return ::Rack::File.new(ASSETS_PATH).call(env)
         when /^\/glimpse/
-          glimpse_method = req.path_info.gsub(/^\/glimpse\//, '')
-          response_body, contentType = self.send(glimpse_method, req.params["request_id"], req)
-          return [200, { 'Content-Type' => contentType }, [response_body]]
+          begin
+            glimpse_method = req.path_info.gsub(/^\/glimpse\//, '')
+            response_body, contentType = self.send(glimpse_method, req.params["request_id"], req)
+            return [200, { 'Content-Type' => contentType }, [response_body]]
+          rescue Exception => ex
+            puts ex.message
+            puts ex.backtrace.join("\n")
+          end
         else
           pass_on_to_app(req, env)
         end

@@ -13,7 +13,7 @@ module Glimpse
           stack = Rails.configuration.middleware
           rows = stack.map do |middleware|
             args = middleware.args
-            [middleware.name, args.empty? ? nil : args]
+            [(middleware.name rescue nil), args.empty? ? nil : args]
           end
           rows.unshift(['Class', 'Args'])
 
