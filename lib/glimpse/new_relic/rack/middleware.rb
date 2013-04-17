@@ -29,14 +29,9 @@ module Glimpse::NewRelic
           env["PATH_INFO"].gsub!(/^\/glimpse\/assets/, '')
           return ::Rack::File.new(ASSETS_PATH).call(env)
         when /^\/glimpse/
-          begin
-            glimpse_method = req.path_info.gsub(/^\/glimpse\//, '')
-            response_body, contentType = self.send(glimpse_method, req.params["request_id"], req)
-            return [200, { 'Content-Type' => contentType }, [response_body]]
-          rescue Exception => ex
-            puts ex.message
-            puts ex.backtrace.join("\n")
-          end
+          glimpse_method = req.path_info.gsub(/^\/glimpse\//, '')
+          response_body, contentType = self.send(glimpse_method, req.params["request_id"], req)
+          return [200, { 'Content-Type' => contentType }, [response_body]]
         else
           pass_on_to_app(req, env)
         end
@@ -48,7 +43,11 @@ module Glimpse::NewRelic
           'data' => {}
         }
         @providers.each do |provider|
-          provider.data_for_request(request_uuid, request_info)
+          begin
+            provider.data_for_request(request_uuid, request_info)
+          rescue Exception => ex
+            puts ex.message
+          end
         end
         round_numbers(request_info['data'])
         request_json = request_info.to_json
@@ -59,6 +58,8 @@ module Glimpse::NewRelic
         else
           [request_json, "application/json"]
         end
+      rescue Exception => ex
+        ["#{ex.message}\n#{ex.backtrace.join("\n")}", "text/plain"]
       end
 
       def popup(request_uuid, _)
@@ -100,13 +101,21 @@ EOH
 
       def begin_request(env, request_uuid)
         @providers.each do |provider|
-          provider.begin_request(env, request_uuid)
+          begin
+            provider.begin_request(env, request_uuid)
+          rescue Exception => ex
+            puts "#{ex.message}"
+          end
         end
       end
 
       def end_request(env, request_uuid, status, headers, response, duration)
         @providers.each do |provider|
-          provider.end_request(env, request_uuid, status, headers, response, duration)
+          begin
+            provider.end_request(env, request_uuid, status, headers, response, duration)
+          rescue Exception => ex
+            puts "#{ex.message}"
+          end
         end
       end
 
