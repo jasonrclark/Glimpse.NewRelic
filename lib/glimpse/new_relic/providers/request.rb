@@ -20,7 +20,7 @@ module Glimpse
 
         def data_for_request(request_uuid, request_info)
           request, response = (@requests[request_uuid] || [{}, {}])
-          request_info['clientId'] = "Chrome 21"    # Sniff from the user-agent... gem maybe?
+          request_info['clientId'] = "Chrome 34"    # Sniff from the user-agent... gem maybe?
           request_info['contentType'] = response["Content-Type"]
           request_info['uri'] = request["REQUEST_URI"]
           request_info['data'][self.name] =

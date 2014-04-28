@@ -8,19 +8,19 @@ module Glimpse
 
         def initialize
           @statements = {}
-          ::NewRelic::Agent.instance.events.subscribe('sql') do |sql, config, duration|
+          ::NewRelic::Agent.instance.events.subscribe(:sql) do |payload|
             request_uuid = Thread.current[:new_relic_request_uuid]
             @statements[request_uuid] ||= []
-            @statements[request_uuid] << [sql, config, duration]
+            @statements[request_uuid] << payload.dup
           end
         end
 
         def sql_trace_table(request_uuid)
           rows = [['Duration (ms)', 'Query']]
           entries = @statements[request_uuid] || []
-          entries.each do |(sql, _, duration)|
-            pretty_sql = sql.gsub("\n", ' ').gsub("\s+", ' ').strip
-            rows << [duration * 1000, pretty_sql]
+          entries.each do |entry|
+            pretty_sql = entry[:sql].gsub("\n", ' ').gsub("\s+", ' ').strip
+            rows << [entry[:duration] * 1000, pretty_sql]
           end
           rows
         end

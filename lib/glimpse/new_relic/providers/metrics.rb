@@ -9,8 +9,8 @@ module Glimpse
 
         def initialize
           @metrics = {}
-          ::NewRelic::Agent.instance.events.subscribe('transaction_metrics') do |stats|
-            @metrics[Thread.current[:new_relic_request_uuid]] = stats
+          ::NewRelic::Agent.instance.events.subscribe(:transaction_finished) do |payload|
+            @metrics[Thread.current[:new_relic_request_uuid]] = payload[:metrics]
           end
         end
 
@@ -18,7 +18,7 @@ module Glimpse
           rows = [['Name', 'Scope', 'Call Count', 'Total Time (ms)', 'Mean Time (ms)']]
           stats_hash = @metrics[request_uuid]
           return rows unless stats_hash
-          stats_hash.each do |metric_spec, stats|
+          stats_hash.sort_by{|k,v| k.name + k.scope}.each do |metric_spec, stats|
             rows << [
               metric_spec.name,
               metric_spec.scope,

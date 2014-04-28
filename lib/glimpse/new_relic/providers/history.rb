@@ -11,7 +11,7 @@ module Glimpse
         def end_request(env, request_uuid, status, headers, response, duration)
           parent_request_id = env["HTTP_GLIMPSE_PARENT_REQUESTID"]
           @requests << {
-            "clientId" => "Chrome 21",
+            "clientId" => "Chrome 34",
             "dateTime" => Time.now.to_s,
             "duration" => duration,
             "parentRequestId" => parent_request_id,
@@ -28,7 +28,7 @@ module Glimpse
 
         def requests
           {
-            "Chrome 21" => @requests.dup
+            "Chrome 34" => @requests.dup
           }
         end
 

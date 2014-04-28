@@ -2,6 +2,8 @@ require "glimpse/new_relic/version"
 require "glimpse/new_relic/rack/middleware"
 require "glimpse/new_relic/providers/base"
 
+require "glimpse/new_relic/patches/transaction_sampler"
+
 module Glimpse
   module NewRelic
     def self.startup

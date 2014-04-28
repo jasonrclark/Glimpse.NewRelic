@@ -31,7 +31,7 @@ module Glimpse
         end
 
         def end_request(env, request_uuid, status, headers, response, duration)
-          @traces[request_uuid] = ::NewRelic::Agent::TransactionInfo.get.transaction.transaction_trace
+          @traces[request_uuid] = ::NewRelic::Agent::TransactionState.get.most_recent_transaction.transaction_trace
         end
 
         def seconds_to_milliseconds(t)
